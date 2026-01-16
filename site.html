@@ -14,6 +14,7 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-blend-mode: multiply;
+            background-position: center center;
             margin: 0;
             padding: 0;
             color: #f5f7ff;
@@ -168,7 +169,7 @@
         // Timer global
         let timerDuration = 15 * 60; // 15 minutes en secondes
         let timerInterval;
-        let timerEnd = Date.now() + timerDuration * 1000;
+        let timerEnd; // on ne l'initialise plus ici
 
         function updateTimer() {
             const now = Date.now();
@@ -180,7 +181,7 @@
             if (remaining <= 0) {
                 clearInterval(timerInterval);
                 document.getElementById('timerValue').textContent = "00:00";
-                // Optionnel : afficher un message ou bloquer l'accès
+                localStorage.removeItem('timerEnd'); // plus de timer à sauvegarder
             }
         }
 
@@ -189,7 +190,25 @@
             timerInterval = setInterval(updateTimer, 1000);
         }
 
-        window.onload = startTimer;
+        // nouvelle fonction d'init qui relit la valeur stockée
+        function initTimer() {
+            const now = Date.now();
+            const storedEnd = Number(localStorage.getItem('timerEnd'));
+
+            if (storedEnd && storedEnd > now) {
+                // on continue le vieux timer
+                timerEnd = storedEnd;
+            } else {
+                // on démarre un nouveau compte à rebours
+                timerEnd = now + timerDuration * 1000;
+                localStorage.setItem('timerEnd', timerEnd);
+            }
+
+            startTimer();
+        }
+
+        // window.onload = startTimer;
+        window.onload = initTimer;
 
         const CORRECT_CODE = "DONALD"; // code à entrer
         let errorTimeoutId; // timeout pour masquer le gif après 2s
@@ -198,15 +217,14 @@
             const input = document.getElementById('codeInput').value;
             const errorMsg = document.getElementById('errorMsg');
             if (input === CORRECT_CODE) {
-                // Affiche la nouvelle pièce
                 document.getElementById('main').innerHTML = `
                     <img src="final.png" alt="final" style="width:100%;border-radius:12px;box-shadow:0 0 20px rgba(0,255,170,0.5);">
                     <div style="margin-top:16px;font-size:1.2em;color:#a0ffb8;">
                         Congratulations! You saved the president!
                     </div>
                 `;
-                // Stop le timer and change la couleur du timer en vert
                 clearInterval(timerInterval);
+                localStorage.removeItem('timerEnd'); // on arrête de persister le timer
             } else {
                 // Affiche le gif + message drôle pendant 2 secondes
                 clearTimeout(errorTimeoutId);
@@ -220,6 +238,15 @@
                     errorMsg.innerHTML = "";
                 }, 3000);
             }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            localStorage.removeItem('timerEnd');
+
+            const now = Date.now();
+            timerEnd = now + timerDuration * 1000;
+            localStorage.setItem('timerEnd', timerEnd);
         }
     </script>
 </body>
