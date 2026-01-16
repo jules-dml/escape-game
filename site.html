@@ -216,7 +216,7 @@
         function checkCode() {
             const input = document.getElementById('codeInput').value;
             const errorMsg = document.getElementById('errorMsg');
-            if (input === CORRECT_CODE) {
+            if (input.toUpperCase() === CORRECT_CODE) {
                 document.getElementById('main').innerHTML = `
                     <img src="final.png" alt="final" style="width:100%;border-radius:12px;box-shadow:0 0 20px rgba(0,255,170,0.5);">
                     <div style="margin-top:16px;font-size:1.2em;color:#a0ffb8;">
@@ -229,10 +229,10 @@
                 // Affiche le gif + message drôle pendant 2 secondes
                 clearTimeout(errorTimeoutId);
                 errorMsg.innerHTML = `
-                    <<div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
                         <img src="trump-dance.gif" alt="Trump dance" style="max-width:180px;border-radius:8px;">
                         <span>Wrong code... but at least Trump is having fun! Try again 😄</span>
-                    </div>>
+                    </div>
                 `;
                 errorTimeoutId = setTimeout(() => {
                     errorMsg.innerHTML = "";
